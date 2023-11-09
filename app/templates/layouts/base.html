@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Flask App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Additional CSS files or styles can be included here -->
+</head>
+
+<body class="container">
+    <header>
+        <div class="logo">Logo</div>
+        <nav>
+            <p>About Us</p>
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+        <!-- Content unique to each page -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <!-- Footer content -->
+        <p>© 2023 Semantic Retrieval</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Additional JavaScript files or scripts can be included here -->
+
+</body>
+
+</html>
