@@ -3,7 +3,17 @@
 
 {% block content %}
 <div class="search-container">
-    <input type="text" id="search-box" placeholder="Search...">
-    <button id="search-button">🔍</button>
+    <form action="/" method="post">
+        {{ form.hidden_tag() }}
+        <input id="search-box" type="text" name="query" placeholder="Enter your query">
+        {% if form.query.errors %}
+        <div class="errors">
+            {% for error in form.query.errors %}
+            <span style="color: red;">{{ error }}</span><br>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <button id="search-button" type="submit">🔍</button>
+    </form>
 </div>
 {% endblock %}
