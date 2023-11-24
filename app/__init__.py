@@ -1,12 +1,27 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
 from flask_wtf.csrf import CSRFProtect
 
+# Load environment variables
 load_dotenv()
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
+#Create app instance
+app = Flask(__name__)
+
+#Update app config
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize CSRF protection
 csrf = CSRFProtect(app)
 
-from app import views
+# Initialize SQLAlchemy and Flask-Migrate
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+from app import views, commands
+from .models import Resources, Publications
