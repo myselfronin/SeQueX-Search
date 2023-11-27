@@ -23,5 +23,9 @@ csrf = CSRFProtect(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-from app import views, commands
-from .models import Resources, Publications
+# Register all commands from the commands package
+from app.commands import register_commands
+register_commands(app)
+
+from app import views
+from .models import Papers
