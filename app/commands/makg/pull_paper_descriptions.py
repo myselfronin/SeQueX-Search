@@ -60,8 +60,6 @@ def pull_paper_decriptions():
 
 def make_query(makg_uris):
     # Constructing the FILTER clause with the resource URLs
-    # filter_query = " || ".join(f"?paper = <{url}>" for url in makg_uris)
-    # filter_query = f"FILTER ({filter_query})"  # Wrap the conditions with 
     filter_query = f"FILTER (?paper IN ({', '.join(['<' + convert_http_to_https(url) + '>' for url in makg_uris])}))"
 
 

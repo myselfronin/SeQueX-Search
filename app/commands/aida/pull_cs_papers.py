@@ -1,4 +1,3 @@
-
 import click
 
 from app import db
