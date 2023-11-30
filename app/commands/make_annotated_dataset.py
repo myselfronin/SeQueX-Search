@@ -14,8 +14,11 @@ def make_annotated_dataset():
     offset = 0
     total_paper_count = Papers.query.filter(Papers.title != None, Papers.syntactic_topics != None).count()
 
+    # Calculate the split between trainig and test dataset : 80/20
+    train_count = int(total_paper_count * 0.8)
+
     doc_id = 1
-    with open('storage/annotated_dataset.jsonl', 'a') as file:
+    with open('storage/annotated_train_dataset.jsonl', 'a') as train_file, open('storage/annotated_test_dataset.jsonl', 'a') as test_file:
         while True:
             papers = Papers.query.filter(Papers.title != None, Papers.syntactic_topics != None).limit(limit).offset(offset).all()
 
@@ -24,7 +27,12 @@ def make_annotated_dataset():
                 # Check if 'label' key has a non-empty array
                 if len(annnoted_dict["label"]) > 0:
                     annotated_string = json.dumps(annnoted_dict)
-                    file.write(annotated_string + '\n')
+
+                    # Check the append to train or test file
+                    if doc_id <= train_count:
+                        train_file.write(annotated_string + '\n')
+                    else:
+                        test_file.write(annotated_string + '\n')
         
                     doc_id += 1
                 
