@@ -23,8 +23,10 @@ def search():
         ner = NamedEntityRecognition()
 
         entities = ner.get_entities(query)
-        for ent in entities:
-            print(ent)
+
+        ner_highlighted_text = highlight_entities(query, entities)
+
+        return render_template("search.html", documents=[], total_results=0, time_taken=0, page=1, query=query, search_option=search_option, ner_highlighted_text=ner_highlighted_text)
     
     else: 
         # Keyword based search
@@ -51,3 +53,19 @@ def keyword_search(query, start=0, rows=PAGE_SIZE):
     results = solr_service.get_paper_matches(solr_query, start=start, rows=rows)
 
     return results
+
+
+
+def highlight_entities(text, entities):
+    """
+    Generates HTML with recognized entities highlighted.
+
+    :param text: Original text
+    :param entities: List of entities to highlight
+    :return: HTML with highlighted entities
+    """
+    for entity in entities:
+        highlighted = f"<span style='background-color: #3a9c8b; color: white;'>{entity}</span>"
+        text = text.replace(entity, highlighted)
+
+    return text

@@ -3,23 +3,34 @@
 
 {% block content %}
 <header>
-    <div class="top-search-bar">
-        <form action="{{ url_for('search') }}" id="search-form">
-            <input  type="text" id="search-box" name="query" 
-                value="{{ request.args.get('query', '') }}"
-                placeholder="Search for publications..."
-            >
-            <div class="radio-buttons">
-                {% set current_option = request.args.get('search_option', 'sqe') %}
-                <input type="radio" id="option1" name="search_option" 
-                    value="sqe" {% if current_option =='sqe' %}checked{% endif %}>
-                <label for="option1">Semantic Query Expansion</label>
-                <input type="radio" id="option2" name="search_option" 
-                    value="keyword" {% if current_option =='keyword' %}checked{% endif %}>
-                <label for="option2">Keyword based</label>
+    <a href="/"><h2>SeQueX Search</h2></a>
+    <div class="top-content">
+        <div class="top-search-bar">
+            <form action="{{ url_for('search') }}" id="search-form">
+                <input type="text" id="search-box" name="query" value="{{ request.args.get('query', '') }}"
+                    placeholder="Search for publications...">
+                <button type="submit">Search</button>
+        
+                <div class="radio-buttons">
+                    {% set current_option = request.args.get('search_option', 'sqe') %}
+                    <input type="radio" id="option1" name="search_option" value="sqe" {% if current_option=='sqe' %}checked{%
+                        endif %}>
+                    <label for="option1">Semantic Query Expansion</label>
+                    <input type="radio" id="option2" name="search_option" value="keyword" {% if current_option=='keyword'
+                        %}checked{% endif %}>
+                    <label for="option2">Keyword based</label>
+                </div>
+            </form>
+        </div>
+        {% if ner_highlighted_text %}
+        <div class="ner-box">
+            <h3>Named Entity Recognition</h3>
+            <div class="ner-query">
+                {{ ner_highlighted_text|safe }}
             </div>
-            <button type="submit">Search</button>
-        </form>
+        </div>
+        
+        {% endif %}
     </div>
 </header>
 <main class="search-results">
@@ -27,7 +38,9 @@
         <!-- <p>Filter</p> -->
     </div>
     <div class="content">
+        <hr/>
         <p class="small-text">About {{ total_results }} results in {{ time_taken }} sec</p>
+        <hr/>
         <div class="result-box">
             {% for doc in documents %}
                 <div class="search-result">
