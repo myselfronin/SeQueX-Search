@@ -1,7 +1,8 @@
 import ssl
 from SPARQLWrapper import SPARQLWrapper, JSON, POST
+import os
 
-MAKG_ENDPOINT = "https://makg.org/sparql"
+MAKG_ENDPOINT = os.environ.get('MAKG_ENDPOINT')
 sparql = SPARQLWrapper(MAKG_ENDPOINT)
 
 # Disable SSL verification (use with caution)

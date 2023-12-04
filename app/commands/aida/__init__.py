@@ -1,7 +1,9 @@
 import ssl
 from SPARQLWrapper import SPARQLWrapper, JSON, POST
+import os
 
-AIDA_ENDPOINT = "https://aida.kmi.open.ac.uk/sparqlendpoint"
+AIDA_ENDPOINT = os.environ.get('AIDA_ENDPOINT')
+
 sparql = SPARQLWrapper(AIDA_ENDPOINT)
 
 # Disable SSL verification (use with caution)
