@@ -1,37 +1,53 @@
 from app import app
 from flask import request, render_template
-from flask_wtf import FlaskForm
-from wtforms import StringField, RadioField
-from wtforms.validators import DataRequired
 from app.services.ner import NamedEntityRecognition
+from app.services.solr import SolrService
+from app.components.query_preprocessor import QueryPreprocessor
 import spacy
 import os
-class SearchForm(FlaskForm):
-    query = StringField('Query', validators=[DataRequired()])
-    search_option = RadioField('Search Option', choices=[('sqe', 'Semantic Query Expansion'), ('keyword', 'Keyword based')], default='sqe', validators=[DataRequired()])
 
+PAGE_SIZE=10
 
 @app.route("/", methods=["GET"])
 def index():
-    form = SearchForm()
-    return render_template("home.html", form=form)
+    return render_template("home.html")
 
-@app.route("/", methods=["GET"])
-def home():
-    return render_template("home.html", form=form)
-
-@app.route("/search", methods=["GET", "POST"])
+@app.route("/search", methods=["GET"])
 def search():
-    form = SearchForm()
-    if form.validate_on_submit():
-        print(form.search_option.data)
-        query = form.query.data
+    page = request.args.get('page', 1, type=int)
+    query = request.args.get('query', '')
+    search_option = request.args.get('search_option', 'sqe') 
+
+    if search_option == 'sqe':
+        # SQE based search
         ner = NamedEntityRecognition()
 
         entities = ner.get_entities(query)
         for ent in entities:
             print(ent)
+    
+    else: 
+        # Keyword based search
+        start = (page - 1) * PAGE_SIZE  # Assuming 10 results per page
+        results = keyword_search(query, start=start)
+        total_results = results['total_results']
+        time_taken = results['time_taken']
+        documents = results['documents']
+
+        return render_template("search.html", documents=documents, total_results=total_results, time_taken=time_taken, page=page, query=query, search_option=search_option)
         
-        return render_template("search.html", form=form)
-    else:
-        return render_template("home.html", form=form)
+
+def keyword_search(query, start=0, rows=PAGE_SIZE):
+    processed_query = QueryPreprocessor().preprocess(query)
+    keywords = processed_query.split()
+
+    solr_service = SolrService()
+
+    # Construct solr query to search in abstract and title
+    solr_query = solr_service.make_keyword_based_query(keywords)
+    print(solr_query)
+
+    # Execute the query in the solr engine
+    results = solr_service.get_paper_matches(solr_query, start=start, rows=rows)
+
+    return results
