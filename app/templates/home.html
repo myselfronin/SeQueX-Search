@@ -2,18 +2,25 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<div class="search-container">
-    <form action="/" method="post">
-        {{ form.hidden_tag() }}
-        <input id="search-box" type="text" name="query" placeholder="Enter your query">
-        {% if form.query.errors %}
-        <div class="errors">
-            {% for error in form.query.errors %}
-            <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        {% endif %}
-        <button id="search-button" type="submit">🔍</button>
-    </form>
-</div>
+    <div class="search-container">
+        <h1>SeQueX Search</h1>
+        <form action="/search" method="post">
+            {{ form.hidden_tag() }}
+            <input type="text" id="search-box" name="query" placeholder="Search for publications...">
+            <button type="submit">Search</button>
+            {% if form.query.errors %}
+            <div class="errors">
+                {% for error in form.query.errors %}
+                <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="radio-buttons">
+                <input type="radio" id="option1" name="search_option" value="sqe" checked>
+                <label for="sqe">Semantic Query Expansion</label>
+                <input type="radio" id="option2" name="search_option" value="keyword">
+                <label for="keyword">Keyword based</label>
+            </div>
+        </form>
+    </div>
 {% endblock %}

@@ -1,0 +1,40 @@
+<!-- Extend from base layout -->
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<header>
+    <div class="top-search-bar">
+        <form action="/search" method="post">
+            {{ form.hidden_tag() }}
+            <input type="text" id="search-box" name="query" placeholder="Search for publications...">
+            <button type="submit">Search</button>
+            {% if form.query.errors %}
+            <div class="errors">
+                {% for error in form.query.errors %}
+                <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</header>
+<main class="search-results">
+    <div class="sidebar">
+        <p>Filter</p>
+    </div>
+    <div class="content">
+        <p class="small-text">About 59,500 results (0.12 sec)</p>
+        <div class="result-box">
+            <div class="search-result">
+                <h3 class="result-title"><a href="#">Result Title 1</a></h3>
+                <p class="result-url">www.example.com</p>
+                <p class="result-description">This is a description of the first search result. It typically contains a brief summary of the content.</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>© 2023 Semantic Retrieval</p>
+</footer>
+{% endblock %}
