@@ -9,7 +9,9 @@ class QueryPreprocessor:
         self.stop_words = set(stopwords.words('english'))
 
     def preprocess(self, query):
-        tokens = word_tokenize(query)
+        # Remove quote if exists any
+        new_query = query.replace('"', '').replace("'", '')
+        tokens = word_tokenize(new_query)
         filtered_tokens = [token.lower() for token in tokens if token.lower() not in self.stop_words]
         processed_query = ' '.join(filtered_tokens)
         return processed_query

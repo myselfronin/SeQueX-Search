@@ -28,6 +28,15 @@
             <div class="ner-query">
                 {{ ner_highlighted_text|safe }}
             </div>
+            <h4>Recognized Entities</h4>
+            
+            {% if recognized_entities %}
+            <ul>
+                {% for entity in recognized_entities %}
+                <li>{{ entity }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </div>
         
         {% endif %}
@@ -39,7 +48,7 @@
     </div>
     <div class="content">
         <hr/>
-        <p class="small-text">About {{ total_results }} results in {{ time_taken }} sec</p>
+        <p class="small-text">About {{ total_results }} results in {{ time_taken }} ms</p>
         <hr/>
         <div class="result-box">
             {% for doc in documents %}

@@ -21,12 +21,12 @@ def search():
     if search_option == 'sqe':
         # SQE based search
         ner = NamedEntityRecognition()
+        processed_query = QueryPreprocessor().preprocess(query)
+        entities, corrected_dict = ner.get_entities(processed_query)
+        corrected_query = replace_corrected_entities(query, corrected_dict)
+        ner_highlighted_text = highlight_entities(corrected_query, entities)
 
-        entities = ner.get_entities(query)
-
-        ner_highlighted_text = highlight_entities(query, entities)
-
-        return render_template("search.html", documents=[], total_results=0, time_taken=0, page=1, query=query, search_option=search_option, ner_highlighted_text=ner_highlighted_text)
+        return render_template("search.html", documents=[], total_results=0, time_taken=0, page=1, query=query, search_option=search_option, ner_highlighted_text=ner_highlighted_text, recognized_entities=entities)
     
     else: 
         # Keyword based search
@@ -69,3 +69,15 @@ def highlight_entities(text, entities):
         text = text.replace(entity, highlighted)
 
     return text
+
+def replace_corrected_entities(query, corrected_dict):
+    """
+    Replace incorrect spellings in the query with their corrected forms.
+
+    :param query: The original query string.
+    :param corrected_dict: Dictionary of incorrect spellings and their corrections.
+    :return: Updated query with corrected spellings.
+    """
+    for incorrect, corrected in corrected_dict.items():
+        query = query.replace(incorrect, corrected)
+    return query
