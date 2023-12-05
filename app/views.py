@@ -3,6 +3,7 @@ from flask import request, render_template
 from app.services.ner import NamedEntityRecognition
 from app.services.solr import SolrService
 from app.components.query_preprocessor import QueryPreprocessor
+from app.components.canditate_entity_generator import CandidateEntityGenerator
 import spacy
 import os
 
@@ -26,7 +27,10 @@ def search():
         corrected_query = replace_corrected_entities(query, corrected_dict)
         ner_highlighted_text = highlight_entities(corrected_query, entities)
 
-        return render_template("search.html", documents=[], total_results=0, time_taken=0, page=1, query=query, search_option=search_option, ner_highlighted_text=ner_highlighted_text, recognized_entities=entities)
+        #Candidate Terms
+        candidate_entities = CandidateEntityGenerator(entities).get_candidate_from_topic_indexes()
+
+        return render_template("search.html", documents=[], total_results=0, time_taken=0, page=1, query=query, search_option=search_option, ner_highlighted_text=ner_highlighted_text, recognized_entities=entities, candidate_entities=candidate_entities)
     
     else: 
         # Keyword based search

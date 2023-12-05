@@ -28,15 +28,30 @@
             <div class="ner-query">
                 {{ ner_highlighted_text|safe }}
             </div>
-            <h4>Recognized Entities</h4>
-            
-            {% if recognized_entities %}
-            <ul>
-                {% for entity in recognized_entities %}
-                <li>{{ entity }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
+            <div class="entities-box">
+                <div class="recognized-entities">
+                    <h4>Recognized Entities</h4>
+                    
+                    {% if recognized_entities %}
+                    <ul>
+                        {% for entity in recognized_entities %}
+                        <li>{{ entity }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="candidate-entities">
+                    <h4>Candidate Entities</h4>
+                    
+                    {% if candidate_entities %}
+                    <ul>
+                        {% for entity in candidate_entities %}
+                        <li>{{ entity }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
         </div>
         
         {% endif %}

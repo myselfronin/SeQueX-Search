@@ -67,6 +67,14 @@ button:hover {
     border-radius: 10px;
     padding: 10px;
 }
+.entities-box {
+    display: flex;
+}
+
+.entities-box .recognized-entities {
+    margin-right: 50px;
+}
+
 .search-results {
     display: flex;
 }
