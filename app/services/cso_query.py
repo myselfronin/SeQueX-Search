@@ -22,7 +22,9 @@ def get_topics_from_cso():
     """, initNs={"cso": CSO, "rdf": RDF, "rdfs": RDFS})
 
     # Execute SPARQL Query
-    topics = [str(row.topicLabel) for row in g.query(q)]
+    results = g.query(q)
+
+    topics = {str(row.topic): str(row.topicLabel) for row in results}
     
     return topics
 

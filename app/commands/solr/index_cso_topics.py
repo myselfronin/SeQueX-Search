@@ -14,7 +14,7 @@ def solr_index_topics():
 
     topics = get_topics_from_cso()
 
-    documents = [{'id': f"CSO_TOPIC_{i}", 'topic': topic} for i, topic in enumerate(topics)]
+    documents = [{'uri': f"{uri}", 'topic': label} for uri, label in topics.items()]
 
     # POST Request to store the topic index
     response = requests.post(SOLR_TOPICS_URL, data=json.dumps(documents), headers={'Content-Type': 'application/json'}, params={"commitWithin": 1000})
