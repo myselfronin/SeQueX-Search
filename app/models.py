@@ -23,3 +23,12 @@ class Papers(db.Model):
     )
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class Topics(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cso_uri = db.Column(db.String, nullable=False, unique=True)
+    label = db.Column(db.String)
+    dbpedia_uri = db.Column(db.String)
+    description_pulled = db.Column(db.Boolean, default=False, info={'description': 'Flag to denote whether the description from DBpedia has been pulled or not'})
+    description = db.Column(db.Text, nullable=True)
