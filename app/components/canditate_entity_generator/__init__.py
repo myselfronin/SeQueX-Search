@@ -1,6 +1,4 @@
 from app.services.solr import SolrService
-from app.services.cso_query import get_topics_via_relations, get_topics_via_relations_test
-from app import logger
 
 class CandidateEntityGenerator:
     def __init__(self, recognized_ents):

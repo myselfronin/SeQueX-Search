@@ -2,7 +2,7 @@ import click
 import json
 import requests
 import os
-from app.services.cso_query import get_topics_from_cso
+from app.services.cso import CSOQueryService
 
 SOLR_BASE_URL = os.environ.get('SOLR_BASE_URL')
 
@@ -12,7 +12,7 @@ SOLR_TOPICS_URL = f"{SOLR_BASE_URL}/topics/update"
 def solr_index_topics():
     click.echo("Indexing CSO topics to solr...")
 
-    topics = get_topics_from_cso()
+    topics = CSOQueryService.get_topics_from_cso()
 
     documents = [{'uri': f"{uri}", 'topic': label} for uri, label in topics.items()]
 

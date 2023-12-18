@@ -1,7 +1,7 @@
 import click
 
 from app import db
-from app.services.cso_query import get_topics_from_cso_with_dbpedia_uri
+from app.services.cso import CSOQueryService
 from app.models import Topics
 
 @click.command("topic:add_from_cso")
@@ -14,7 +14,7 @@ def add_topics_from_cso():
     
     click.echo("Adding CSO topics to solr...")
 
-    topics = get_topics_from_cso_with_dbpedia_uri()
+    topics = CSOQueryService().get_topics_from_cso_with_dbpedia_uri()
 
     for uri, topic_info in topics.items():
         # Extract label and DBpedia URI from the topic_info dictionary

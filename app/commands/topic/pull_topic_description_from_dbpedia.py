@@ -1,7 +1,6 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import click
 import os
-from app.services.cso_query import get_topics_from_cso
 from app.models import Topics
 from app import db
 
