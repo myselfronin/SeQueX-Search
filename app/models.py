@@ -23,6 +23,7 @@ class Papers(db.Model):
     )
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_annotation_processed = db.Column(db.Boolean, default=False)
 
 
 class Topics(db.Model):
