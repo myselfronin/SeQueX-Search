@@ -8,13 +8,29 @@ class SolrService:
     def get_topic_matches(self, query_texts):
         solr = pysolr.Solr(self.base_url + '/topics')
 
-        # Construct query to get all possibe match in the query_texts array
+        # Construct the query
         query = ' OR '.join([f'topic:"{text}"' for text in query_texts])
 
-        # Send request to Solr
-        results = solr.search(query)
+        # Set an initial limit for the number of rows per query
+        rows_per_query = 100
+        start = 0
+        all_results = []
 
-        return results.docs
+        while True:
+            # Fetch a batch of results
+            results = solr.search(query, **{'rows': rows_per_query, 'start': start})
+
+            # If no more results, break out of the loop
+            if not results.docs:
+                break
+
+            # Add results to the list
+            all_results.extend(results.docs)
+
+            # Move to the next batch
+            start += rows_per_query
+
+        return all_results
     
     def get_paper_matches(self, query_string, start=0, rows=10):
         solr = pysolr.Solr(self.base_url + '/papers')
