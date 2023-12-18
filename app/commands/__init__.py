@@ -19,5 +19,4 @@ def register_commands(app):
     app.cli.add_command(solr_index_papers)
     app.cli.add_command(add_topics_from_cso)
     app.cli.add_command(pull_topic_description_from_dbpedia)
-    app.cli.add_command(make_ner_dataset)
     app.cli.add_command(make_bio_tagged_dataset)
