@@ -1,11 +1,11 @@
 from app import app
 from flask import request, render_template
-from app.services.ner import NamedEntityRecognition
+from app.components.ner import NamedEntityRecognition
 from app.services.solr import SolrService
 from app.components.query_preprocessor import QueryPreprocessor
 from app.components.canditate_entity_generator import CandidateEntityGenerator
-from app.components.candidate_entity_disambiguation import CandidateRanking
 from app.components.candidate_entity_disambiguation import CandidateDisambiguator
+from app.components.query_expansion import QueryExpansion
 from app import logger
 
 PAGE_SIZE=10
@@ -39,7 +39,7 @@ def search():
         ### Named Entity Recognition ###
         ner = NamedEntityRecognition()
         entities, corrected_dict = ner.get_entities(processed_query)
-
+       
         ### Corrected query spelling if any found ###
         corrected_query = replace_corrected_entities(query, corrected_dict)
         ner_highlighted_text = highlight_entities(corrected_query, entities)
@@ -65,7 +65,13 @@ def search():
         logger.info('\n' + '\n'.join(formatted_pairs))
         #--------
 
-        exit()
+        ### Query Expansion ###
+        expanded_keywords = QueryExpansion(linked_entities).get_expanded_entities()
+        #--------
+        log_expanded_keywords(expanded_keywords)
+        #--------
+
+        return 'hi'
         #Search in Solr
         results = semantic_search(candidate_entities, start=start)
 
@@ -137,4 +143,11 @@ def log_candidates_set(candidate_set):
                         for entity, candidates in candidate_set.items()]
     # Join the formatted strings and log them
     logger.info('\n'.join(formatted_entries))
+
+def log_expanded_keywords(expanded_keywords):
+    for entity_label, relations in expanded_keywords.items():
+        logger.info(f"Entity: {entity_label}")
+        for relation_type, uris in relations.items():
+            uris_str = ', '.join(uris)
+            logger.info(f"\t{relation_type}: {uris_str}")
     
