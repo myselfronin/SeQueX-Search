@@ -17,14 +17,14 @@ class NamedEntityRecognition:
         def from_lexical_ner():
             results['lexical_ne'] = LexicalNER(self.text).get_entities()
 
-        def from_ngram_ner():
-            results['ngram_ne'] = NGramNER(self.text).get_entities()
+        # def from_ngram_ner():
+        #     results['ngram_ne'] = NGramNER(self.text).get_entities()
 
         def from_csoner():
             results['model_ne'] = CSONER(self.text).get_entities()
 
         threads.append(Thread(target=from_lexical_ner))
-        threads.append(Thread(target=from_ngram_ner))
+        # threads.append(Thread(target=from_ngram_ner))
         threads.append(Thread(target=from_csoner))
 
         for thread in threads:
@@ -32,4 +32,5 @@ class NamedEntityRecognition:
         for thread in threads:
             thread.join()
 
-        return set(results['ngram_ne'] + results['lexical_ne'] + results['model_ne'])
+        # return set(results['ngram_ne'] + results['lexical_ne'] + results['model_ne'])
+        return set(results['lexical_ne'] + results['model_ne'])

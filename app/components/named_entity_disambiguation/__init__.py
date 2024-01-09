@@ -62,7 +62,7 @@ class NamedEntityDisambiguator:
 
     def log_candidates_set(self, candidate_set):
         # Create a list of formatted strings
-        formatted_entries = [f"Recognized Entity: '{entity}', Candidate Entities: {', '.join(candidates)}" 
+        formatted_entries = [f"Recognized Entity: '{entity}', Candidate Entities [{len(candidates)}]: {', '.join(candidates)}" 
                             for entity, candidates in candidate_set.items()]
         # Join the formatted strings and log them
         logger.info('\n'.join(formatted_entries))

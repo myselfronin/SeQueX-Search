@@ -1,13 +1,15 @@
-import time
 from app import app
-from flask import request, render_template
+from flask import request, render_template, Response
 from app.services.solr import SolrService
 from app.components.text_processing import TextProcessor
 from app.components.named_entity_disambiguation import NamedEntityDisambiguator
 from app.components.query_expansion import QueryExpansion
 from app import logger
+import time
+import os
 
-PAGE_SIZE=10
+PAGE_SIZE = 10
+PATH_TO_LOG_FILE = os.path.join(app.root_path, '../myapp.log')
 
 @app.route("/", methods=["GET"])
 def index():
@@ -50,7 +52,14 @@ def search():
 
         process_taken_time = time.time() - process_start_time
         return render_template("search.html", documents=results['documents'], total_results=results['total_results'], time_taken=results['time_taken'], page=page, query=query, search_option=search_option, process_time = process_taken_time)
-        
+
+@app.route('/logs')
+def logs():
+    return render_template('logs.html')
+
+@app.route('/stream-logs')
+def stream_logs():
+    return Response(read_log_file(), mimetype='text/event-stream')
 
 def keyword_search(query, start=0, rows=PAGE_SIZE):
     processed_query = TextProcessor().preprocess(query)
@@ -78,33 +87,16 @@ def semantic_search(entities, start=0, rows=PAGE_SIZE):
 
     return results
 
-def highlight_entities(text, entities):
-    """
-    Generates HTML with recognized entities highlighted.
 
-    :param text: Original text
-    :param entities: List of entities to highlight
-    :return: HTML with highlighted entities
-    """
-    for entity in entities:
-        highlighted = f"<span style='background-color: #3a9c8b; color: white;'>{entity}</span>"
-        text = text.replace(entity, highlighted)
-
-    return text
-
-def replace_corrected_entities(query, corrected_dict):
-    """
-    Replace incorrect spellings in the query with their corrected forms.
-
-    :param query: The original query string.
-    :param corrected_dict: Dictionary of incorrect spellings and their corrections.
-    :return: Updated query with corrected spellings.
-    """
-    for incorrect, corrected in corrected_dict.items():
-        query = query.replace(incorrect, corrected)
-    return query
-
-
+def read_log_file():
+    with open(PATH_TO_LOG_FILE, "r") as log:
+        log.seek(0, os.SEEK_END)  # Move to the end of the file
+        while True:
+            line = log.readline()
+            if not line:
+                time.sleep(0.1)  # Sleep briefly
+                continue
+            yield f"data: {line}\n\n"
 
 
     
