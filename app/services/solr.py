@@ -54,4 +54,18 @@ class SolrService:
 
         return solr_query
     
+
+    def make_query_for_expanded_entities(self, expanded_entities):
+        # Function to join terms with the OR operator
+        def join_terms(original_entity, expansion_term):
+            all_terms = [original_entity] + expansion_term
+            return " OR ".join(all_terms)
+
+        # Create sub-queries for each mention and join them with OR
+        sub_queries = [f"(title:({join_terms(entity, expansion_terms)}) OR abstract:({join_terms(entity, expansion_terms)}))" for entity, expansion_terms in expanded_entities.items()]
+
+        # Join the sub-queries with the AND operator
+        expanded_query = " AND ".join(sub_queries)
+
+        return expanded_query
         

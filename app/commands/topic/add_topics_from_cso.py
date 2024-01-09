@@ -1,7 +1,7 @@
 import click
 
 from app import db
-from app.services.cso import CSOQueryService
+from app.services.cso_query import CSOQueryService
 from app.models import Topics
 
 @click.command("topic:add_from_cso")

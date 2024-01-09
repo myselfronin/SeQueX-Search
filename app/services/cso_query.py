@@ -77,3 +77,39 @@ class CSOQueryService:
         }
         return topics
 
+    def get_related_equivalent_topics(self, topic_uri):
+        """
+        Retrieves topics that are equivalent to a given topic.
+
+        :param topic_uri: URI of the topic.
+        :return: A list of URIs of related equivalent topics.
+        """
+        
+        query_string = f"""
+        SELECT ?relatedTopic
+        WHERE {{
+            <{topic_uri}> cso:relatedEquivalent ?relatedTopic .
+        }}
+        """
+        results = self.execute_query(query_string)
+        related_topics = [str(row.relatedTopic) for row in results]
+        return related_topics
+
+    def get_super_topics(self, topic_uri):
+        """
+        Retrieves super-topics (broader topics) of a given topic.
+
+        :param topic_uri: URI of the topic.
+        :return: A list of URIs of super-topics.
+        """
+
+        query_string = f"""
+        SELECT ?superTopic
+        WHERE {{
+            <{topic_uri}> cso:superTopicOf ?superTopic .
+        }}
+        """
+  
+        results = self.execute_query(query_string)
+        super_topics = [str(row.superTopic) for row in results]
+        return super_topics

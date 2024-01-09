@@ -1,8 +1,8 @@
 from app.services.solr import SolrService
 
 class CandidateEntityGenerator:
-    def __init__(self, recognized_ents):
-        self.recognized_ents = recognized_ents
+    def __init__(self, recognized_entities):
+        self.recognized_entities = recognized_entities
         self.solr_service = SolrService()
 
     def get_candidates(self):
@@ -23,7 +23,7 @@ class CandidateEntityGenerator:
         :return: Dictionary of recognized entities and their corresponding candidate topics
         """
         candidate_entities = {}
-        for entity in self.recognized_ents:
+        for entity in self.recognized_entities:
             ngrams = set(entity.split())
             topics = {item['uri'][0] for item in self.solr_service.get_topic_matches(ngrams) if 'uri' in item and item['uri']} # set
             candidate_entities[entity] = topics
@@ -31,8 +31,3 @@ class CandidateEntityGenerator:
         return candidate_entities
     
 
-    # def get_same_topic_from_cso(self):
-    #     results = get_topics_via_relations(self.recognized_ents, ['owl#sameAs'])
-    #     # results = get_topics_via_relations_test(self.recognized_ents, ["owl#sameAs", "skos#related"])
-
-    #     return results

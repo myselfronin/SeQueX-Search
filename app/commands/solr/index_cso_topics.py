@@ -2,7 +2,7 @@ import click
 import json
 import requests
 import os
-from app.services.cso import CSOQueryService
+from app.services.cso_query import CSOQueryService
 
 SOLR_BASE_URL = os.environ.get('SOLR_BASE_URL')
 

@@ -4,7 +4,6 @@ import re
 class LexicalNER:
     def __init__(self, text):
         self.text = text
-        nltk.download('punkt')
 
     def get_entities(self):
         # Extract entities within quotes

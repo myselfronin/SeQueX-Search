@@ -20,20 +20,16 @@ class NGramNER():
         # Match the ngrams with possibel topic to recognize possible topic entities
         # Exact match and Levenshtein distance
         matched_entities = []
-        corrected_dict = {}
         for ngram in ngrams:
             for topic in possible_topics:
                 # Check for exact match or close match within a certain threshold
                 if ngram == topic or self.is_close_match(ngram, topic, threshold=2):
                     matched_entities.append(topic)
 
-                    # If any spelling mistack then add to corrected_dict
-                    if ngram != topic:
-                        corrected_dict[ngram] = topic
                     break  # Stop checking other topics if a match is found
 
 
-        return matched_entities, corrected_dict
+        return matched_entities
     
 
     def generate_ngrams(self, n):

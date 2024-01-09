@@ -22,41 +22,10 @@
                 </div>
             </form>
         </div>
-        {% if ner_highlighted_text %}
-        <div class="ner-box">
-            <h3>Named Entity Recognition</h3>
-            <div class="ner-query">
-                {{ ner_highlighted_text|safe }}
-            </div>
-            <div class="entities-box">
-                <div class="recognized-entities">
-                    <h4>Recognized Entities</h4>
-                    
-                    {% if recognized_entities %}
-                    <ul>
-                        {% for entity in recognized_entities %}
-                        <li>{{ entity }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-                <div class="candidate-entities">
-                    <h4>Candidate Entities</h4>
-                    
-                    {% if candidate_entities %}
-                    <ul>
-                        {% for entity in candidate_entities %}
-                        <li>{{ entity }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        {% endif %}
+    
     </div>
 </header>
+<p>Overall taken: {{process_time}} seconds</p>
 <main class="search-results">
     <div class="sidebar">
         <!-- <p>Filter</p> -->
