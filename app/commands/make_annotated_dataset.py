@@ -8,6 +8,11 @@ BATCH_SIZE = 1000
 
 @click.command("make:annotated_dataset")
 def make_annotated_dataset():
+    """
+    This command string matches the topic in the abstract and title of the paper and annote the position where the TOPIC instance of CSO is situated.
+    This was create as a starting point of training spacy model. But as we are
+    using bert model a different annotation scheme is used called BIO tagging scheme.
+    """
     click.echo("Creating annotated dataset...")
 
     limit = BATCH_SIZE
