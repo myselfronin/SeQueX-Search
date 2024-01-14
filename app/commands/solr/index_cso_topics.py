@@ -12,7 +12,7 @@ SOLR_TOPICS_URL = f"{SOLR_BASE_URL}/topics/update"
 def solr_index_topics():
     click.echo("Indexing CSO topics to solr...")
 
-    topics = CSOQueryService.get_topics_from_cso()
+    topics = CSOQueryService().get_topics_from_cso()
 
     documents = [{'uri': f"{uri}", 'topic': label} for uri, label in topics.items()]
 
