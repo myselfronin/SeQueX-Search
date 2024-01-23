@@ -1,0 +1,62 @@
+<!-- Extend from base layout -->
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<header>
+    <a href="/"><h2>SeQueX Search</h2></a>
+    <div class="top-content">
+        <div class="top-search-bar">
+            <form action="{{ url_for('search') }}" id="search-form">
+                <input type="text" id="search-box" name="query" value="{{ request.args.get('query', '') }}"
+                    placeholder="Search for publications...">
+                <button type="submit">Search</button>
+        
+                <div class="radio-buttons">
+                    {% set current_option = request.args.get('search_option', 'sqe') %}
+                    <input type="radio" id="option1" name="search_option" value="sqe" {% if current_option=='sqe' %}checked{%
+                        endif %}>
+                    <label for="option1">Semantic Query Expansion</label>
+                    <input type="radio" id="option2" name="search_option" value="keyword" {% if current_option=='keyword'
+                        %}checked{% endif %}>
+                    <label for="option2">Keyword based</label>
+                </div>
+            </form>
+        </div>
+    
+    </div>
+</header>
+<p>Overall taken: {{process_time}} seconds</p>
+<main class="search-results">
+    <div class="sidebar">
+        <!-- <p>Filter</p> -->
+    </div>
+    <div class="content">
+        <hr/>
+        <p class="small-text">About {{ total_results }} results in {{ time_taken }} ms</p>
+        <hr/>
+        <div class="result-box">
+            {% for doc in documents %}
+                <div class="search-result">
+                    <h3 class="result-title"><a href="#">{{ doc.title }}</a></h3>
+                    <p class="result-url">www.example.com</p>
+                    <p class="result-description">{{ doc.abstract }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <!-- Pagination Links -->
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="{{ url_for('search', page=page-1, query=query, search_option=search_option) }}">Previous</a>
+            {% endif %}
+            <span>Page {{ page }}</span>
+            {% if documents|length == 10 %} <!-- Assuming 10 results per page -->
+            <a href="{{ url_for('search', page=page+1, query=query, search_option=search_option) }}">Next</a>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>© 2023 Semantic Retrieval</p>
+</footer>
+{% endblock %}

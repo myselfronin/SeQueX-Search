@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  flaskapp:
+    container_name: flaskapp
+    build: 
+      context: ../
+      dockerfile: docker/Dockerfile
+    ports: 
+      - "${APP_HOST_PORT}:5000"
+    env_file:
+      - ../.env
+    volumes:
+      - ../:/app
+    networks:
+      - tuc_thesis_sqe
+
+  postgres:
+    image: postgres
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: thesis
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    ports:
+      - "${POSTGRES_HOST_PORT}:5432"
+    networks:
+      - tuc_thesis_sqe
+
+  solr:
+    build:
+      context: ./solr
+    container_name: solr_search
+    ports:
+      - "${SOLR_HOST_PORT}:8983"
+    volumes:
+      - solr_data:/opt/solr/server/solr/mycores
+    networks:
+      - tuc_thesis_sqe
+
+volumes:
+  postgres_data:
+  solr_data:
+
+networks:
+  tuc_thesis_sqe:
