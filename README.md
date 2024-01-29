@@ -119,4 +119,4 @@ For querying CSO from the Fuseki UI, follow these steps:
 
 ## Authors
 
-- **Rabinson Ghatani** - *Initial work* - [YourUsername](https://github.com/myselfronin)
+- **Rabinson Ghatani** - *Initial work* - [myselfronin](https://github.com/myselfronin)
