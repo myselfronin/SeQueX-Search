@@ -1,6 +1,6 @@
 # SeQueX Search
 
-SeQueX Search is a sophisticated retrieval system designed for Computer Science publications, enhancing the search process through Semantic Query Expansion (SQE) techniques. By integrating Named Entity Disambiguation and leveraging the CSO Ontology for query expansion, it significantly improves the accuracy and relevance of search results.
+SeQueX Search is a sophisticated retrieval system designed for Computer Science publications, enhancing the search process through Semantic Query Expansion (SQE) techniques. Integrating Named Entity Disambiguation and leveraging the CSO Ontology for query expansion, significantly improves the accuracy and relevance of search results.
 
 ## Features
 
@@ -39,7 +39,7 @@ Before proceeding, ensure that Docker and Docker Compose are installed and runni
    - Copy the flaskapp/env.example file to flaskapp/.env.
 
 4. **Build Docker Containers:**
-   Within the `implementation/docker` directory, build the Docker containers using:
+   Within the `/docker` directory, build the Docker containers using:
    ```
    docker-compose build
    ```
@@ -98,6 +98,9 @@ With the application and database ready, proceed to index the data:
    ```
    docker exec -it flaskapp flask solr:index_evaluation_papers
    ```
+
+### Accessing SeQueX Search
+Access the Fuseki UI at `http://localhost:<APP_HOST_PORT>/`, replacing `<APP_HOST_PORT>` with the port configured in your Docker setup.
 
 ### Accessing Fuseki Server
 
