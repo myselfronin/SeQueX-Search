@@ -10,6 +10,8 @@ solr start
 solr create_core -c papers
 solr create_core -c topics
 
+solr create_core -c evaluationpapers
+
 # Stop Solr
 solr stop
 

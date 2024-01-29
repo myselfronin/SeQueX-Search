@@ -28,7 +28,7 @@ migrate = Migrate(app, db)
 logger = logging.getLogger('myapp_logger')
 logger.setLevel(logging.INFO)  # Adjust the level as needed
 
-file_handler = logging.FileHandler('myapp.log')
+file_handler = logging.FileHandler('search.log')
 file_handler.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

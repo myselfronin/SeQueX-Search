@@ -16,6 +16,14 @@ class NamedEntityDisambiguator:
         linked_entities = self.candidate_entity_disambiguation(candidate_set_for_entities, self.processed_query)
 
         return linked_entities
+    
+    # For evaluating the disambiguation proess the entites are already provided skipping NER
+    def get_linked_entities_from_given_entities(self, recognized_entities):
+        candidate_set_for_entities = self.candidate_entity_generation(recognized_entities)
+
+        linked_entities = self.candidate_entity_disambiguation(candidate_set_for_entities, self.processed_query)
+
+        return linked_entities
 
     
     def named_entity_recognition(self):
@@ -25,7 +33,6 @@ class NamedEntityDisambiguator:
         #--------
 
         entities = NamedEntityRecognition(self.processed_query).get_entities()
-
         #--------
         ner_time_taken = time.time() - ner_start_time
         logger.info("NER time taken: " + str(ner_time_taken) + " seconds")

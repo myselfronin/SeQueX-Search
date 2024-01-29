@@ -1,9 +1,10 @@
 import click
 import json
 import re
+import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
-
 from app.models import Papers
+
 
 # Constants
 BATCH_SIZE = 10000
@@ -11,6 +12,8 @@ ENTITY_TYPE = 'TOPIC'  # Entity type used in BIO tagging
 
 @click.command("make:bio_tagged_dataset")
 def make_bio_tagged_dataset():
+    nltk.download('punkt')
+    
     """Command to create an annotated dataset with BIO tagging."""
     click.echo("Creating bio tagged dataset...")
 

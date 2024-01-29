@@ -5,13 +5,13 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from threading import Thread
+import traceback
 
+EXPANSION_SIMILARITY_THRESHOLD=0.55
 class QueryExpansion:
     def __init__(self, linked_entities, user_query):
         self.linked_entities = linked_entities
         self.user_query = user_query
-        self.num_of_query_term = 5 #This is the number of query term to select at max for each mention
-
     
     def get_expanded_entities(self):
         """
@@ -20,29 +20,45 @@ class QueryExpansion:
         :return: A dictionary where each key is an entity label and the value is a dictionary of expansion terms.
         """
         expanded_entities = {}
-        for entity_label, entity_uri in self.linked_entities.items():
-            expansion_terms = self.get_ranked_expansion_term(entity_uri)
-            expanded_entities[entity_label] = expansion_terms
 
-        
+        #Link is formed only when corresponding URI is available hence filtering 
+        filtered_linked_entities = {k: v for k, v in self.linked_entities.items() if v is not None}
+    
+        recognized_topic_uris = filtered_linked_entities.values()
+
+        related_equivalent_topics_dict = CSOQueryService().get_related_equivalent_topics(recognized_topic_uris)
+
+        sub_topics_dict = CSOQueryService().get_sub_topics(recognized_topic_uris)
+       
+        for linked_entity_label, linked_entity_uri in filtered_linked_entities.items():
+            candidate_topic_uris = set()
+
+            if(linked_entity_uri in related_equivalent_topics_dict):
+                candidate_topic_uris.update(related_equivalent_topics_dict[linked_entity_uri].split(","))
+
+            if(linked_entity_uri in sub_topics_dict):
+                candidate_topic_uris.update(sub_topics_dict[linked_entity_uri].split(","))
+
+            expanded_entities[linked_entity_label] = self.get_ranked_expansion_term(list(candidate_topic_uris))
+
+
         return expanded_entities
     
-    def get_ranked_expansion_term(self, topic_uri):
+    def get_ranked_expansion_term(self, candidate_uris):
         """
-        Fetches and ranks expansion terms for a given topic URI.
+        Ranks candidate expansion terms.
 
-        :param topic_uri: URI of the topic for which to find expansion terms.
+        :param candidate_uris: List of URIs that are possibly candidates
         :return: A dictionary of ranked expansion terms.
         """
-        expansion_term_uris = self.get_expansion_topic_uri_based_on_relation(topic_uri)  
         
-        combined_uris = list(set(element for sublist in expansion_term_uris.values() for element in sublist))
-
         term_with_description = (Topics.query.with_entities(Topics.cso_uri, Topics.label, Topics.description)
-            .filter(Topics.cso_uri.in_(combined_uris)).all())
+            .filter(Topics.cso_uri.in_(candidate_uris)).all())
         
+    
         # Weighing each expansion terms
         score_card = {}
+        max_score = 0
 
         # Similairty score of each possible expansion terms
         for uri, label, description in term_with_description:
@@ -53,45 +69,18 @@ class QueryExpansion:
             context_similarity_score = self.cosine_similarity(self.user_query, description_text)
 
             score_card[uri] = { 'label': label, 'score': context_similarity_score }
+        
+        # If the score of the expansion term is greate or equal to the threshold then its is selected
+        filtered_score_card = {uri: data for uri, data in score_card.items() if data['score'] >= EXPANSION_SIMILARITY_THRESHOLD}
 
-        #order the possible expansion terms based on the weight in score_card
-        sorted_score_card = sorted(score_card.items(), key=lambda x: x[1]['score'], reverse=True)
-        top_candidate = sorted_score_card[: self.num_of_query_term]
+        for uri, data in score_card.items():
+            max_score = data['score'] if data['score'] > max_score  else max_score
+        
+        # Extract the label from the filtered score card
+        expansion_term_labels = [details['label'] for details in filtered_score_card.values()]
 
-        # Create a list of labels for the top_n entries
-        top_labels = [details['label'] for _, details in top_candidate]
-
-        return top_labels
+        return expansion_term_labels
     
-    def get_expansion_topic_uri_based_on_relation(self, topic_uri):
-        """
-        Fetches expansion terms for a given topic URI based on CSO ontology relations.
-
-        :param topic_uri: URI of the topic for which to find expansion terms.
-        :return: A dictionary of expansion terms categorized by relation type.
-        """
-        expansion_terms = {}
-
-        # Fetch related equivalent topics
-        def fetch_related_equivalents():
-            expansion_terms['relatedEquivalent'] = CSOQueryService().get_related_equivalent_topics(topic_uri)
-
-        def fetch_super_topics():
-            expansion_terms['superTopicOf'] = CSOQueryService().get_super_topics(topic_uri)
-
-        # Create threads
-        thread1 = Thread(target=fetch_related_equivalents)
-        thread2 = Thread(target=fetch_super_topics)
-
-        # Start threads
-        thread1.start()
-        thread2.start()
-
-        # Wait for threads to complete
-        thread1.join()
-        thread2.join()
-
-        return expansion_terms
 
     def jaccard_similarity(self, text1, text2):
         """

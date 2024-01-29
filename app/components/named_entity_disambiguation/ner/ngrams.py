@@ -1,6 +1,7 @@
 from Levenshtein import distance as levenshtein_distance
 from app.services.solr import SolrService
 
+LEVENSTEIN_DISTANCE_THRESHOLD = 1
 class NGramNER():
     def __init__(self, text):
         self.text = text
@@ -22,8 +23,7 @@ class NGramNER():
         matched_entities = []
         for ngram in ngrams:
             for topic in possible_topics:
-                # Check for exact match or close match within a certain threshold
-                if ngram == topic or self.is_close_match(ngram, topic, threshold=2):
+                if self.is_close_match(ngram, topic, threshold=LEVENSTEIN_DISTANCE_THRESHOLD):
                     matched_entities.append(topic)
 
                     break  # Stop checking other topics if a match is found

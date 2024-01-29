@@ -33,7 +33,7 @@ class SolrService:
         return all_results
     
     def get_paper_matches(self, query_string, start=0, rows=10):
-        solr = pysolr.Solr(self.base_url + '/papers')
+        solr = pysolr.Solr(self.base_url + '/evaluationpapers')
 
         # Execute the query with pagination parameters
         results = solr.search(query_string, start=start, rows=rows)
@@ -47,25 +47,30 @@ class SolrService:
 
         return response
     
-    def make_keyword_based_query(self, keywords):
-        solr_query_parts = [f"(title:{keyword} OR abstract:{keyword})" for keyword in keywords]
-
-        solr_query = " OR ".join(solr_query_parts)
-
-        return solr_query
-    
+    def make_keyword_based_query(self, query_string):
+        query_string = self.escape_solr_special_char(query_string)
+        
+        return f"(title:*{query_string}* OR abstract:*{query_string}*)"
 
     def make_query_for_expanded_entities(self, expanded_entities):
         # Function to join terms with the OR operator
         def join_terms(original_entity, expansion_term):
             all_terms = [original_entity] + expansion_term
-            return " OR ".join(all_terms)
+
+            all_term_with_removed_special_char = [self.escape_solr_special_char(term) for term in all_terms]
+            return " OR ".join(all_term_with_removed_special_char)
 
         # Create sub-queries for each mention and join them with OR
-        sub_queries = [f"(title:({join_terms(entity, expansion_terms)}) OR abstract:({join_terms(entity, expansion_terms)}))" for entity, expansion_terms in expanded_entities.items()]
+        sub_queries = [f"(title:({join_terms(entity, expansion_terms)}) OR abstract:({join_terms(entity, expansion_terms)}) OR semantic_topics:({join_terms(entity, expansion_terms)}))" for entity, expansion_terms in expanded_entities.items()]
 
         # Join the sub-queries with the AND operator
-        expanded_query = " AND ".join(sub_queries)
+        expanded_query = " OR ".join(sub_queries)
 
         return expanded_query
+    
+    def escape_solr_special_char(self, query):
+        special_chars = ["+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", '"', "~", "*", "?", ":"]
+        for char in special_chars:
+            query = query.replace(char, "\\" + char)
+        return query
         
