@@ -43,7 +43,11 @@ Before proceeding, ensure that Docker and Docker Compose are installed and runni
    ```
    docker-compose build
    ```
-
+5. **Download CSO NER Model:**
+   This model is required in CSONER service for entity recognition
+   ```
+   docker exec -it flaskapp flask download:cso_ner_model
+   ```
 5. **Start the Application:**
    Launch the application in detached mode by running:
    ```
