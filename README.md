@@ -70,7 +70,7 @@ Before the application is fully operational, you need to set up and optionally p
    docker exec -i postgres_db psql -U admin -d thesis < docker/dump.sql
    
 3. **(Option 2) For data: Run commands**
-   - Login to the flaskapp bash
+   - Access the flaskapp bash
      ```bash
      docker exec -i flaskapp bash
      ```
@@ -79,8 +79,8 @@ Before the application is fully operational, you need to set up and optionally p
      flask aida:pull_cs_papers
      flask aida:pull_paper_topics
      flask topic:add_from_cso
-     topic:get_dbpedia_link
-     topic:get_description_from_dbpedia
+     flask topic:get_dbpedia_link
+     flask topic:get_description_from_dbpedia
      ```
 
 ### Indexing Data in Solr Core
