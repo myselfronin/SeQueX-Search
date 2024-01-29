@@ -66,23 +66,22 @@ Before the application is fully operational, you need to set up and optionally p
    docker exec -i postgres_db psql -U admin -d thesis < docker/dump.sql
    
 3. **(Option 2) For data: Run commands**
-   - Pull papers data from AIDA by executing the following command in your terminal:
+   - Login to the flaskapp bash
      ```bash
      docker exec -i flaskapp bash
      ```
-   - Within the Docker container, run the following Flask commands to pull computer science papers and their topics:
+   - Within the Docker container, run the following Flask commands to pull papers from AIDA and store CSO topics in database:
      ```bash
      flask aida:pull_cs_papers
      flask aida:pull_paper_topics
-     ```
-   - To store the topics data in the database table, execute:
-     ```bash
      flask topic:add_from_cso
+     topic:get_dbpedia_link
+     topic:get_description_from_dbpedia
      ```
 
 ### Indexing Data in Solr Core
 
-With the application and database ready, proceed to indexing the data:
+With the application and database ready, proceed to index the data:
 
 1. **Index CSO Topics:**
    ```
@@ -110,13 +109,6 @@ For querying CSO from the Fuseki UI, follow these steps:
    cat shiro.ini
    ```
 2. Access the Fuseki UI at `http://localhost:<FUSEKI_SERVER_PORT>/`, replacing `<FUSEKI_SERVER_PORT>` with the port configured in your Docker setup.
-
-## Running Tests
-
-Execute automated tests within the Docker environment using:
-```
-docker-compose run --rm web python -m unittest discover tests
-```
 
 ## Authors
 
