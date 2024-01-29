@@ -4,8 +4,8 @@ from app import db
 from app.models import Papers
 from . import construct_sparql_query, execute_query
 
-MAX_PAPERS = 200000 # How many papers should be pulled in total
-BATCH_SIZE = 10000
+MAX_PAPERS = 1000 # How many papers should be pulled in total
+BATCH_SIZE = 100
 
 @click.command("aida:pull_cs_papers", help = "This command performs SPARQL query to AIDA KG to pull CS papers and store in DB. The limit is 10000 papers and the offset will start from count in the table so as to pull new paper every time command runs")
 def pull_cs_papers():

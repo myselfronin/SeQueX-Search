@@ -7,9 +7,12 @@ from app.components.query_expansion import QueryExpansion
 from app import logger
 import time
 import os
+import traceback
+from datetime import timedelta
+
 
 PAGE_SIZE = 10
-PATH_TO_LOG_FILE = os.path.join(app.root_path, '../myapp.log')
+PATH_TO_LOG_FILE = os.path.join(app.root_path, '../search.log')
 
 @app.route("/", methods=["GET"])
 def index():
@@ -17,41 +20,45 @@ def index():
 
 @app.route("/search", methods=["GET"])
 def search():
-    page = request.args.get('page', 1, type=int)
-    query = request.args.get('query', '')
-    search_option = request.args.get('search_option', 'sqe') 
-    start = (page - 1) * PAGE_SIZE 
+    try:
+        page = request.args.get('page', 1, type=int)
+        query = request.args.get('query', '')
+        search_option = request.args.get('search_option', 'sqe') 
+        start = (page - 1) * PAGE_SIZE 
+        process_start_time = time.time()
+        # SQE based search
+        if search_option == 'sqe':
+            #--------
+            logger.info('\n\n\n\nSQE SEARCH')
+            logger.info('Query Text: '+ query)
+            #--------
 
-    process_start_time = time.time()
-    # SQE based search
-    if search_option == 'sqe':
-        #--------
-        logger.info('\n\n\n\nSQE SEARCH')
-        logger.info('Query Text: '+ query)
-        #--------
+            ### Preprocess Query ###
+            processed_query = TextProcessor().preprocess(query)
 
-        ### Preprocess Query ###
-        processed_query = TextProcessor().preprocess(query)
+            ### Named Entity Disambiguation ###
+            linked_entities = NamedEntityDisambiguator(processed_query).get_linked_entities()
 
-        ### Named Entity Disambiguation ###
-        linked_entities = NamedEntityDisambiguator(processed_query).get_linked_entities()
+            ### Query Expansion ###
+            expanded_entities = QueryExpansion(linked_entities, query).get_expanded_entities()
+        
+            #Search in Solr
+            results = semantic_search(expanded_entities, start=start)
 
-        ### Query Expansion ###
-        expanded_entities = QueryExpansion(linked_entities, processed_query).get_expanded_entities()
-    
-        #Search in Solr
-        results = semantic_search(expanded_entities, start=start)
+            process_taken_time = time.time() - process_start_time
 
-        process_taken_time = time.time() - process_start_time
+            return render_template("search.html", documents=results['documents'], total_results=results['total_results'], time_taken=results['time_taken'], page=page, query=query, search_option=search_option,process_time = format_seconds(process_taken_time))
+        
+        else: 
+            # Keyword based search
+            results = keyword_search(query, start=start)
+            logger.info(str(results))
+            process_taken_time = time.time() - process_start_time
 
-        return render_template("search.html", documents=results['documents'], total_results=results['total_results'], time_taken=results['time_taken'], page=1, query=query, search_option=search_option,process_time = process_taken_time)
-    
-    else: 
-        # Keyword based search
-        results = keyword_search(query, start=start)
-
-        process_taken_time = time.time() - process_start_time
-        return render_template("search.html", documents=results['documents'], total_results=results['total_results'], time_taken=results['time_taken'], page=page, query=query, search_option=search_option, process_time = process_taken_time)
+            return render_template("search.html", documents=results['documents'], total_results=results['total_results'], time_taken=results['time_taken'], page=page, query=query, search_option=search_option, process_time = format_seconds(process_taken_time))
+    except Exception as e:
+        traceback.print_exc()
+        return e
 
 @app.route('/logs')
 def logs():
@@ -62,13 +69,13 @@ def stream_logs():
     return Response(read_log_file(), mimetype='text/event-stream')
 
 def keyword_search(query, start=0, rows=PAGE_SIZE):
-    processed_query = TextProcessor().preprocess(query)
-    keywords = processed_query.split()
 
     solr_service = SolrService()
 
     # Construct solr query to search in abstract and title
-    solr_query = solr_service.make_keyword_based_query(keywords)
+    solr_query = solr_service.make_keyword_based_query(query)
+
+    logger.info("solr query: " + solr_query)
 
     # Execute the query in the solr engine
     results = solr_service.get_paper_matches(solr_query, start=start, rows=rows)
@@ -99,4 +106,9 @@ def read_log_file():
             yield f"data: {line}\n\n"
 
 
-    
+def format_seconds(value):
+    # Convert to timedelta
+    delta = timedelta(seconds=value)
+    # Get total seconds and format with two decimal places
+    total_seconds = delta.total_seconds()
+    return f"{total_seconds:.2f}"

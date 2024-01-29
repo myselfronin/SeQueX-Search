@@ -4,7 +4,7 @@ from sqlalchemy import ARRAY
 
 class Papers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    aida_uri = db.Column(db.String, nullable=False, unique=True)
+    aida_uri = db.Column(db.String, nullable=True)
     makg_uri = db.Column(db.String, nullable=True)
     is_desc_pulled = db.Column(
         db.Boolean, default=False, 
@@ -20,6 +20,10 @@ class Papers(db.Model):
     syntactic_topics = db.Column(
         ARRAY(db.String), nullable=True,
         info={'description': 'Syntactic Topic (a CSO Topic) labels of the paper from the AIDA KG'}
+    )
+    semantic_topics = db.Column(
+        ARRAY(db.String), nullable=True,
+        info={'description': 'Semantic Topic (a CSO Topic) labels of the paper from the AIDA KG'}
     )
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

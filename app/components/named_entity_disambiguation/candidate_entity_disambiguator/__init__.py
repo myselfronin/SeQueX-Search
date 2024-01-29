@@ -3,6 +3,7 @@ from .local_disambiguation import LocalDisambiguation
 from app.models import Topics
 from app import logger
 
+DISAMBIGUATION_THRESHOLD = 0.7
 class CandidateDisambiguator:
     def __init__(self, query_context, mentions_with_candidate_set):
         """
@@ -44,7 +45,7 @@ class CandidateDisambiguator:
             # Context Similarity Calculation
             context_similarity_score = self.local_disambiguator.context_similarity(self.query_context, description_text)
 
-            # Named Entity Similairty Calculation
+            # Named Entity Similarity Calculation
             named_entity_similarity_score = self.local_disambiguator.entity_name_similarity(mention_label, label)
 
             score_card[uri] = {
@@ -62,8 +63,8 @@ class CandidateDisambiguator:
             logger.info("Ranking of mention: " + mention_label + "\n" + formatted_tuples)
             #--------
 
-            top_candidate = ranked_candidates[0][0]
-            return top_candidate
+            # If the score of the top ranked tuple is greater than a threshold value then only its linked
+            return ranked_candidates[0][0] if ranked_candidates[0][1] >= DISAMBIGUATION_THRESHOLD else None
         else:
             return None
     

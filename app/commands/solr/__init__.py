@@ -25,3 +25,23 @@ def create_core(core_name):
     response = requests.get(create_url)
 
     return response.json()
+
+def update_solr_schema(core_name, fields_to_update):
+    """
+    Update the schemea of the core to configure which fields to be indexed
+    """
+    headers = {'Content-Type': 'application/json'}
+    schema_api_url = f"{SOLR_BASE_URL}/{core_name}/schema"
+
+
+    # Create a payload with all the fields to be updated
+    payload = {"add-field": fields_to_update}
+    response = requests.post(schema_api_url, json=payload, headers=headers)
+
+    if response.status_code != 200:
+        print(f"Error updating fields: {response.text}")
+        return False
+    else:
+        print("Fields updated successfully.")
+        return True
+
